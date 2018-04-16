@@ -29,7 +29,7 @@ class Task extends TaskListItem implements Comparable<Task> {
     // methods required by TaskListItem
     // display the task
     public void display(){
-        System.out.println( title + ": " + description + "(priority: " + priority );
+        System.out.println( title + ": " + description + " (priority: " + priority + ")");
     }
 
     // get the priority
@@ -42,7 +42,7 @@ class Task extends TaskListItem implements Comparable<Task> {
         return title;
     }
 
-    public int comparedTo(Task t) {
+    public int compareTo(Task t) {
         if (!getPriority().equals(t.getPriority())) {  // if the priorities are not the same need high to low
             if (Integer.parseInt(getPriority()) > Integer.parseInt(t.getPriority())) // comes first
                 return BEFORE;
@@ -58,8 +58,9 @@ class Task extends TaskListItem implements Comparable<Task> {
 // list of tasks
 class TaskList extends TaskListItem {
     // instance fields
-    private List<TaskListItem> _tasks = new ArrayList<>();
+    private List<Task> _tasks = new ArrayList<>();
     private UserInterface ui = new UserInterface();
+    int BEFORE = -1, AFTER = 1;
 
     // class field
     private static Scanner scanner = new Scanner(System.in);
@@ -69,7 +70,7 @@ class TaskList extends TaskListItem {
     // methods required by TaskListItem
     // display the task
     public void display(){
-        for (Task task : _tasks)
+        for (TaskListItem task : _tasks)
             task.display();
     }
 
@@ -83,14 +84,13 @@ class TaskList extends TaskListItem {
         return getTitle();
     }
 
-
     // methods
 
     // get task index
     private int getTaskIndex(String curTitle){
         int curTask = -1;
 
-        for (Task task : _tasks) {
+        for (TaskListItem task : _tasks) {
             curTask = _tasks.indexOf(task);
             if (_tasks.get(curTask).getTitle().equals(curTitle))
                 return curTask;
@@ -114,6 +114,11 @@ class TaskList extends TaskListItem {
         // get the Priority
         newPriority = ui.getTaskPriority( 0, 5);
         // add it
+        _tasks.add( new Task(newTitle, newDesc, newPriority));
+    }
+
+    // add a subtask
+    public void addTask(String newTitle, String newDesc, String newPriority){
         _tasks.add( new Task(newTitle, newDesc, newPriority));
     }
 
@@ -172,7 +177,7 @@ class TaskList extends TaskListItem {
                 editDescription = ui.getTaskDescription();
             else
                 // keep it the same
-                editDescription = ui.getTaskDescription();
+                editDescription = currentTask.description;
 
             // ask for a new priority
             System.out.println("Change the priority? (Y/N)");
@@ -197,7 +202,7 @@ class TaskList extends TaskListItem {
     // List tasks of a certain priority
     public void listPriorityTasks(String listPriority){
         // list all tasks in the list with that priority
-        for (Task task : _tasks){
+        for (TaskListItem task : _tasks){
             if ( task.getPriority().equals(listPriority) ) //list it
                 task.display();
         }
@@ -390,5 +395,23 @@ public class Main {
             }
             userChoice = ui.getUserOption(0,6);
         }
+
+        System.out.println("");
+        System.out.println("A list of sub tasks");
+        List<TaskListItem> bigList = new ArrayList<>();
+        TaskList subList = new TaskList();
+
+        bigList.add(new Task("Lone Task", "This task does not have any sub tasks", "3"));
+        subList.addTask("Main Task 1", "This is the top task", "2");
+        subList.addTask("Task 1.1", "Take out the trash", "4");
+        subList.addTask("Task 1.2", "Do the laundry", "2");
+        subList.addTask("Task 1.3", "Finish my homework", "5");
+        bigList.add(subList);
+        for (TaskListItem t : bigList){
+           t.display();
+        }
+
+
     }
+
 }
